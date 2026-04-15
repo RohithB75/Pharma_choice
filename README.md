@@ -23,7 +23,7 @@ pharma_choice/
 ## Setup
 
 ```powershell
-cd "c:\Users\HP\Downloads\Internship\pharma_choice"
+cd "file path"
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
