@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="landing-hero">
+    <div class="landing-copy">
+        <h2>Your Health, Our Priority</h2>
+        <p>Find and order trusted pharmaceutical products with ease.</p>
+        <a class="btn btn-primary cta-btn" href="{{ url_for('register') }}">Start Shopping</a>
+    </div>
+    <div class="landing-visual">
+        <img src="{{ url_for('static', filename='images/pharmacy-hero.svg') }}" alt="Pharmacy shelves and pharmacist illustration">
+    </div>
+</section>
+
+<section class="offer-section">
+    <h3>What We Offer</h3>
+    <div class="offer-grid">
+        <article class="offer-card">
+            <h4>Fast Ordering</h4>
+            <p>Place orders in a few clicks with a simple customer dashboard.</p>
+        </article>
+        <article class="offer-card">
+            <h4>Quality Medicines</h4>
+            <p>Organized catalog with categories for fever, cold, pain relief and more.</p>
+        </article>
+        <article class="offer-card">
+            <h4>Order Tracking</h4>
+            <p>Track order status from placed to shipped and delivered.</p>
+        </article>
+    </div>
+</section>
+{% endblock %}

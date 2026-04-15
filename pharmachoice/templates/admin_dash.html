@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if active_section == 'dashboard' %}
+<section class="panel" id="alert-section">
+    <h3 class="alert-title">Low Stock Alerts (Below 10)</h3>
+    {% if low_stock_drugs %}
+    <table>
+        <thead>
+            <tr>
+                <th>Drug</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th>Last Updated</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for drug in low_stock_drugs %}
+                <tr class="low-stock-row">
+                    <td>{{ drug.name }}</td>
+                    <td>{{ drug.category.name }}</td>
+                    <td>{{ drug.stock }}</td>
+                    <td>{{ drug.last_updated.strftime('%Y-%m-%d %H:%M') if drug.last_updated else '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('update_drug', drug_id=drug.id) }}" class="btn btn-danger restock-link">Restock Now</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="alert-success">
+            ✓ All stocks are sufficient.
+        </div>
+    {% endif %}
+</section>
+{% endif %}
+
+{% if active_section == 'add_category' %}
+<section class="panel centered-form-panel" id="add-category-section">
+    <div>
+        <h3 class="centered-panel-title">Add Category</h3>
+        <form method="POST" action="{{ url_for('add_category') }}" class="form-grid">
+            <label>Enter Category Name</label>
+            <input type="text" name="name" required>
+            <button type="submit" class="btn btn-secondary centered-action-btn">Save Category</button>
+        </form>
+    </div>
+</section>
+{% endif %}
+
+{% if active_section == 'view_category' %}
+<section class="panel" id="category-list-section">
+    <div>
+        <h3 class="centered-panel-title">Available Categories</h3>
+        <div class="category-cards">
+            {% for category in categories %}
+                <article class="category-card">
+                    <h4>{{ category.name }}</h4>
+                    <form method="POST" action="{{ url_for('delete_category', category_id=category.id) }}">
+                        <button type="submit" class="btn btn-danger category-delete-btn">Delete</button>
+                    </form>
+                </article>
+            {% else %}
+                <p class="muted-text">No categories yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if active_section == 'add_drug' %}
+<section class="panel" id="add-drug-section">
+    <h3>Add Drug</h3>
+    <form method="POST" action="{{ url_for('add_drug') }}" class="form-grid two-col">
+        <div>
+            <label>Drug Name</label>
+            <input type="text" name="name" required>
+        </div>
+        <div>
+            <label>Category</label>
+            <select name="category_id" required>
+                <option value="">Select Category</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label>Base Price</label>
+            <input type="number" step="0.01" min="0" name="base_price" required>
+        </div>
+        <div>
+            <label>Discount %</label>
+            <input type="number" step="0.01" min="0" max="100" name="discount_percent" value="0" required>
+        </div>
+        <div>
+            <label>Stock</label>
+            <input type="number" min="0" name="stock" required>
+        </div>
+        <div class="full-width">
+            <button type="submit" class="btn btn-primary">Add Drug</button>
+        </div>
+    </form>
+</section>
+{% endif %}
+
+{% if active_section == 'view_drugs' %}
+<section class="panel" id="inventory-section">
+    <h3 class="centered-panel-title">All Drugs</h3>
+
+    <form method="GET" action="{{ url_for('admin_dashboard') }}" class="view-drug-filter-grid">
+        <input type="hidden" name="section" value="view_drugs">
+
+        <div>
+            <label>Filter by Category</label>
+            <select name="category_id">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if current_category_filter == category.id|string %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Search Drug Name</label>
+            <input type="text" name="q" value="{{ current_drug_query }}" placeholder="e.g., paracetamol">
+        </div>
+
+        <div>
+            <label>Sort</label>
+            <select name="sort">
+                <option value="az" {% if current_sort_option == 'az' %}selected{% endif %}>A - Z</option>
+                <option value="za" {% if current_sort_option == 'za' %}selected{% endif %}>Z - A</option>
+                <option value="price_low" {% if current_sort_option == 'price_low' %}selected{% endif %}>Price Low to High</option>
+                <option value="price_high" {% if current_sort_option == 'price_high' %}selected{% endif %}>Price High to Low</option>
+            </select>
+        </div>
+
+        <div class="filter-action-wrap">
+            <button type="submit" class="btn btn-secondary">Apply</button>
+        </div>
+    </form>
+
+    <div class="admin-drug-cards">
+        {% for drug in drugs %}
+            <article class="admin-drug-card">
+                <h4>{{ drug.name }}</h4>
+                <p class="muted-text drug-category-name">{{ drug.category.name|lower }}</p>
+                <p class="drug-final-price">{{ '%.2f'|format(drug.final_price) }}</p>
+                <p class="drug-base-price">{{ '%.2f'|format(drug.base_price) }}</p>
+                <p class="drug-meta">Discount: {{ '%.1f'|format(drug.discount_percent) }}%</p>
+                <p class="drug-meta">Stock: {{ drug.stock }}</p>
+                <p class="drug-meta">Stock Last Updated: {{ drug.last_updated.strftime('%Y-%m-%d') if drug.last_updated else '-' }}</p>
+
+                <div class="admin-drug-actions">
+                    <a href="{{ url_for('update_drug', drug_id=drug.id) }}" class="btn btn-secondary view-drug-action-btn">Update</a>
+
+                    <form method="POST" action="{{ url_for('delete_drug', drug_id=drug.id) }}" onsubmit="return confirm('Delete this drug?');">
+                        <button type="submit" class="btn btn-danger view-drug-action-btn">Delete</button>
+                    </form>
+                </div>
+            </article>
+        {% else %}
+            <p class="muted-text">No drugs found for the selected filters.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if active_section == 'view_orders' %}
+<section class="panel" id="orders-section">
+    <h3>Customer Orders</h3>
+    <div class="table-wrap">
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Drug</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Change Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td class="customer-cell">
+                        <strong>{{ order.user.name }}</strong><br>
+                        <small class="customer-contact">{{ order.user.email }} | {{ order.user.phone }}</small><br>
+                        <small class="customer-address">{{ order.user.address }}</small>
+                    </td>
+                    <td>{{ order.drug.name }}</td>
+                    <td>{{ order.drug.category.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ '%.2f'|format(order.total_price / order.quantity) if order.quantity > 0 else '0.00' }}</td>
+                    <td>{{ '%.2f'|format(order.total_price) }}</td>
+                    <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('update_order_status', order_id=order.id) }}" class="inline-form">
+                            <select name="status">
+                                <option value="Order Placed" {% if order.status == 'Order Placed' %}selected{% endif %}>Order Placed</option>
+                                <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                            </select>
+                            <button type="submit" class="btn btn-secondary">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="10">No orders available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

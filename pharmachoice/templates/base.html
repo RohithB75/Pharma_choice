@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaChoice</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container nav-wrap">
+            <h1 class="brand">PharmaChoice</h1>
+            <nav>
+                <ul class="nav-list">
+                    {% if session.get('user_id') %}
+                        {% if session.get('role') == 'admin' %}
+                            <li><a class="{% if request.endpoint == 'admin_dashboard' and active_section == 'dashboard' %}is-active{% endif %}" href="{{ url_for('admin_dashboard', section='dashboard') }}">Dashboard</a></li>
+                            <li><a class="{% if request.endpoint == 'admin_dashboard' and active_section == 'add_category' %}is-active{% endif %}" href="{{ url_for('admin_dashboard', section='add_category') }}">Add Category</a></li>
+                            <li><a class="{% if request.endpoint == 'admin_dashboard' and active_section == 'view_category' %}is-active{% endif %}" href="{{ url_for('admin_dashboard', section='view_category') }}">View Category</a></li>
+                            <li><a class="{% if request.endpoint == 'admin_dashboard' and active_section == 'add_drug' %}is-active{% endif %}" href="{{ url_for('admin_dashboard', section='add_drug') }}">Add Drug</a></li>
+                            <li><a class="{% if request.endpoint == 'admin_dashboard' and active_section == 'view_drugs' %}is-active{% endif %}" href="{{ url_for('admin_dashboard', section='view_drugs') }}">View Drugs</a></li>
+                            <li><a class="{% if request.endpoint == 'admin_dashboard' and active_section == 'view_orders' %}is-active{% endif %}" href="{{ url_for('admin_dashboard', section='view_orders') }}">View Orders</a></li>
+                        {% elif session.get('role') == 'customer' %}
+                            <li><a href="{{ url_for('user_dashboard') }}">View Drugs</a></li>
+                            <li><a href="{{ url_for('my_orders') }}">My Orders</a></li>
+                            <li><a href="{{ url_for('view_cart') }}">Cart</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a class="{% if request.endpoint == 'index' %}is-active{% endif %}" href="{{ url_for('index') }}">Home</a></li>
+                        <li><a class="{% if request.endpoint == 'login' %}is-active{% endif %}" href="{{ url_for('login') }}">Login</a></li>
+                        <li><a class="{% if request.endpoint == 'register' %}is-active{% endif %}" href="{{ url_for('register') }}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container page-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-wrap">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

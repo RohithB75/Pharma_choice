@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel" id="inventory-section">
+    <h3 class="centered-panel-title">All Drugs</h3>
+
+    <form method="GET" action="{{ url_for('user_dashboard') }}" class="view-drug-filter-grid">
+        <div>
+            <label>Filter by Category</label>
+            <select name="category_id">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if current_category_id == category.id|string %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Search Drug Name</label>
+            <input type="text" name="q" value="{{ current_q }}" placeholder="e.g., paracetamol">
+        </div>
+
+        <div>
+            <label>Sort</label>
+            <select name="sort">
+                <option value="az" {% if current_sort_option == 'az' %}selected{% endif %}>A - Z</option>
+                <option value="za" {% if current_sort_option == 'za' %}selected{% endif %}>Z - A</option>
+                <option value="price_low" {% if current_sort_option == 'price_low' %}selected{% endif %}>Price Low to High</option>
+                <option value="price_high" {% if current_sort_option == 'price_high' %}selected{% endif %}>Price High to Low</option>
+            </select>
+        </div>
+
+        <div class="filter-action-wrap">
+            <button class="btn btn-secondary" type="submit">Apply</button>
+        </div>
+    </form>
+
+    <div class="admin-drug-cards">
+    {% for drug in drugs %}
+        <article class="admin-drug-card">
+            <h4>{{ drug.name }}</h4>
+            <p class="muted-text drug-category-name">{{ drug.category.name|lower }}</p>
+            <p class="drug-final-price">{{ '%.2f'|format(drug.final_price) }}</p>
+            <p class="drug-base-price">{{ '%.2f'|format(drug.base_price) }}</p>
+            <p class="drug-meta">Discount: {{ '%.1f'|format(drug.discount_percent) }}%</p>
+            <p class="drug-meta">Stock: {{ drug.stock }}</p>
+            <p class="drug-meta">Date: {{ drug.last_updated.strftime('%Y-%m-%d') }}</p>
+
+            <form method="POST" action="{{ url_for('add_to_cart', drug_id=drug.id) }}" class="inline-form">
+                <input type="number" name="quantity" value="1" min="1" max="{{ drug.stock }}" required>
+                <button type="submit" class="btn btn-secondary">Add to Cart</button>
+            </form>
+        </article>
+    {% else %}
+        <div class="panel">
+            <p>No products found for the selected filters.</p>
+        </div>
+    {% endfor %}
+</div>
+</section>
+{% endblock %}

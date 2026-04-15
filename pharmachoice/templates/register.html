@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-card wide">
+    <h2>User Registration</h2>
+    <form method="POST" class="form-grid two-col">
+        <div>
+            <label>Name</label>
+            <input type="text" name="name" required>
+        </div>
+        <div>
+            <label>Email</label>
+            <input type="email" name="email" required>
+        </div>
+        <div>
+            <label>Phone</label>
+            <input type="text" name="phone" required>
+        </div>
+        <div>
+            <label>Gender</label>
+            <select name="gender" required>
+                <option value="">--Select--</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div>
+            <label>Age</label>
+            <input type="number" name="age" min="1" max="150">
+        </div>
+        <div>
+            <label>Pincode</label>
+            <input type="text" name="pincode">
+        </div>
+        <div class="full-width">
+            <label>State</label>
+            <input type="text" name="state">
+        </div>
+        <div class="full-width">
+            <label>Password</label>
+            <input type="password" name="password" required>
+        </div>
+        <div class="full-width">
+            <label>Address</label>
+            <textarea name="address" rows="3" required></textarea>
+        </div>
+        <div class="full-width">
+            <button type="submit" class="btn btn-secondary">Register</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

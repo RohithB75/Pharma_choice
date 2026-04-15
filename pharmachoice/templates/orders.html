@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel">
+    <h2>Orders</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Address</th>
+                <th>Drug</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.user.address }}</td>
+                    <td>{{ order.drug.name }}</td>
+                    <td>{{ order.drug.category.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ '%.2f'|format(order.total_price / order.quantity) if order.quantity > 0 else '0.00' }}</td>
+                    <td>{{ '%.2f'|format(order.total_price) }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="9">No orders yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

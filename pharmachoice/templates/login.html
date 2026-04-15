@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="auth-card login-card-screenshot">
+    <h2 class="login-title">Login</h2>
+    <form method="POST" class="form-grid">
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit" class="btn btn-secondary login-submit">Login</button>
+    </form>
+</section>
+{% endblock %}
