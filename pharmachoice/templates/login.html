@@ -3,6 +3,14 @@
 <section class="auth-card login-card-screenshot">
     <h2 class="login-title">Login</h2>
     <form method="POST" class="form-grid">
+        <!-- Login Type -->
+        <label for="login_type">Login Type</label>
+        <select id="login_type" name="login_type" required>
+            <option value="">--Select--</option>
+            <option value="admin">Admin</option>
+            <option value="customer">Customer</option>
+        </select>
+
         <label>Email</label>
         <input type="email" name="email" required>
 

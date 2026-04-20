@@ -136,12 +136,21 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        login_type = request.form.get("login_type","").strip().lower()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+
+        if login_type not in {"admin","customer"}:
+            flash("Please select a valid login type.", "warning")
+            return redirect(url_for("login"))
 
         user = User.query.filter_by(email=email).first()
         if not user or user.password_hash != password:
             flash("Invalid email or password.", "danger")
+            return redirect(url_for("login"))
+        
+        if user.role != login_type:
+            flash("Selected login type does not match this account.", "danger")
             return redirect(url_for("login"))
 
         session["user_id"] = user.id
